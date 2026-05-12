@@ -1,3 +1,4 @@
+```mermaid
 sequenceDiagram
     autonumber
     actor Prof_User as 교수 (사용자)

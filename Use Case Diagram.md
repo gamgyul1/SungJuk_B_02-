@@ -1,3 +1,4 @@
+```mermaid
 graph LR
     subgraph 성적관리시스템
         UC1(성적입력)

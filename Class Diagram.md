@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
     class Add_SungJuk_UI {
         +display() void

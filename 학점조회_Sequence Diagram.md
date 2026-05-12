@@ -1,3 +1,4 @@
+```mermaid
 sequenceDiagram
     participant User as 사용자/JSP
     participant UI as Search_SungJuk_UI
