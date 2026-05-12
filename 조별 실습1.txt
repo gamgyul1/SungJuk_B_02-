@@ -1,0 +1,82 @@
+graph LR
+    subgraph 성적관리시스템
+        UC1(성적입력)
+        UC2(학점조회)
+        UC3(교수체크)
+        
+        UC1 -.->|&lt;&lt;include&gt;&gt;| UC3
+        UC2 -.->|&lt;&lt;include&gt;&gt;| UC3
+    end
+    
+    교수((교수)) --> UC1
+    교수((교수)) --> UC2
+
+==
+classDiagram
+    class Add_SungJuk_UI {
+        +display() void
+    }
+    class Search_SungJuk_UI {
+        +display() void
+    }
+    class 교수 {
+        -교수id: String
+        +교수체크(교수id: String) boolean
+    }
+    class 성적 {
+        -학생id: String
+        -자바: int
+        -DB: int
+        -보안: int
+        -총점: int
+        -평균: double
+        +성적입력(학생id: String, 자바: int, DB: int, 보안: int) void
+        +학점조회() String
+    }
+
+    Add_SungJuk_UI ..> 교수
+    Search_SungJuk_UI ..> 교수
+    교수 "1" -- "N" 성적 : 관리
+
+=== 성적입력 SD
+sequenceDiagram
+    autonumber
+    actor 교수
+    participant UI as Add_SungJuk_UI
+    participant Prof as 교수
+    participant Grade as 성적
+
+    교수 ->>+ UI: 성적입력 요청(교수id, 학생id, 점수들)
+    UI ->>+ Prof: 교수체크("inha")
+    
+    alt 인증 성공
+        Prof -->>- UI: true
+        UI ->>+ Grade: 성적입력(학생id, 자바, DB, 보안)
+        Note right of Grade: 내부 로직: 총점/평균 계산
+        Grade -->>- UI: 입력 완료 응답
+        UI -->> 교수: 처리 결과(총점, 평균) 출력
+    else 인증 실패
+        Prof -->>+ UI: false
+        UI -->>- 교수: "교수 ID가 일치하지 않습니다."
+    end
+=== 학점조회 SD
+sequenceDiagram
+    autonumber
+    actor 교수
+    participant UI as Search_SungJuk_UI
+    participant Prof as 교수
+    participant Grade as 성적
+
+    교수 ->>+ UI: 학점조회 요청(교수id, 학생id)
+    UI ->>+ Prof: 교수체크("inha")
+
+    alt 인증 성공
+        Prof -->>- UI: true
+        UI ->>+ Grade: 학점조회()
+        Note right of Grade: 평균 기준 학점 부여<br/>(90↑:A, 80↑:B, 80↓:C)
+        Grade -->>- UI: 학점 결과 반환
+        UI -->> 교수: 최종 학점 출력
+    else 인증 실패
+        Prof -->>+ UI: false
+        UI -->>- 교수: "조회 권한이 없습니다."
+    end
