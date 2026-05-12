@@ -1,20 +1,27 @@
 sequenceDiagram
     autonumber
-    actor 교수
+    actor Prof_User as 교수 (사용자)
     participant UI as Add_SungJuk_UI
-    participant Prof as 교수
-    participant Grade as 성적
+    participant P as 교수 (model.prof)
+    participant G as 성적 (model.grade)
 
-    교수 ->>+ UI: 성적입력 요청(교수id, 학생id, 점수들)
-    UI ->>+ Prof: 교수체크("inha")
+    Prof_User ->>+ UI: display(교수id, 학생id, 자바, DB, 보안)
     
-    alt 인증 성공
-        Prof -->>- UI: true
-        UI ->>+ Grade: 성적입력(학생id, 자바, DB, 보안)
-        Note right of Grade: 내부 로직: 총점/평균 계산
-        Grade -->>- UI: 입력 완료 응답
-        UI -->> 교수: 처리 결과(총점, 평균) 출력
-    else 인증 실패
-        Prof -->>+ UI: false
-        UI -->>- 교수: "교수 ID가 일치하지 않습니다."
+    UI ->> P: new 교수()
+    UI ->>+ P: 교수체크(교수id)
+    P -->>- UI: return boolean (true/false)
+    
+    alt 인증 성공 (true)
+        UI ->>+ G: 성적입력(학생id, 자바, DB, 보안)
+        
+        Note over G: 내부 계산 로직 수행
+        G ->> G: 총점 = 자바 + DB + 보안
+        G ->> G: 평균 = 총점 / 3.0
+        
+        G -->>- UI: 입력 및 계산 완료 응답
+        UI -->> UI: 결과 메시지 생성 (총점, 평균 포함)
+    else 인증 실패 (false)
+        UI -->> UI: 결과 메시지 생성 ("ID 일치하지 않음")
     end
+
+    UI -->>- Prof_User: 처리 결과 출력 (HTML String)

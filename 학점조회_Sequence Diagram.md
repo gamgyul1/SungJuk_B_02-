@@ -1,20 +1,37 @@
 sequenceDiagram
-    autonumber
-    actor 교수
+    participant User as 사용자/JSP
     participant UI as Search_SungJuk_UI
-    participant Prof as 교수
-    participant Grade as 성적
+    participant P as 교수 (prof)
+    participant G as 성적 (gradeObj)
 
-    교수 ->>+ UI: 학점조회 요청(교수id, 학생id)
-    UI ->>+ Prof: 교수체크("inha")
+    User->>UI: display(교수id, gradeObj)
+    activate UI
 
-    alt 인증 성공
-        Prof -->>- UI: true
-        UI ->>+ Grade: 학점조회()
-        Note right of Grade: 평균 기준 학점 부여<br/>(90↑:A, 80↑:B, 80↓:C)
-        Grade -->>- UI: 학점 결과 반환
-        UI -->> 교수: 최종 학점 출력
-    else 인증 실패
-        Prof -->>+ UI: false
-        UI -->>- 교수: "조회 권한이 없습니다."
+    UI->>P: new 교수()
+    
+    UI->>P: 교수체크(교수id)
+    activate P
+    P-->>UI: return boolean
+    deactivate P
+
+    alt 교수 인증 성공 (true)
+        UI->>G: 학점조회()
+        activate G
+        
+        %% 성적 객체 내부의 조건문 판별 로직 시각화
+        alt 평균 >= 90
+            G-->>UI: return "A학점"
+        else 평균 >= 80
+            G-->>UI: return "B학점"
+        else 평균 < 80
+            G-->>UI: return "C학점"
+        end
+        deactivate G
+        
+        UI->>UI: 결과 메시지 생성 (학점 포함)
+    else 교수 인증 실패 (false)
+        UI->>UI: 결과 메시지 생성 ("조회 권한 없음")
     end
+
+    UI-->>User: return result (HTML String)
+    deactivate UI
