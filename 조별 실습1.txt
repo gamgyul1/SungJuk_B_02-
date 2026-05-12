@@ -38,7 +38,8 @@ classDiagram
 
     Add_SungJuk_UI ..> 교수
     Search_SungJuk_UI ..> 교수
-    교수 "1" -- "N" 성적 : 관리
+    교수 "1" -- "1..*" 성적 : 관리
+
 
 === 성적입력 SD
 sequenceDiagram
