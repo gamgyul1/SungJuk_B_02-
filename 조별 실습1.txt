@@ -14,9 +14,11 @@ graph LR
 ==
 classDiagram
     class Add_SungJuk_UI {
+        <<boundary>>
         +display() void
     }
     class Search_SungJuk_UI {
+        <<boundary>>
         +display() void
     }
     class 교수 {
